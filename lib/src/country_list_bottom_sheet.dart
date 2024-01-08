@@ -20,6 +20,8 @@ void showCountryListBottomSheet({
   bool showSearch = true,
   bool useSafeArea = false,
   bool useRootNavigator = false,
+  Widget? intialSearchWidget,
+  Widget? searchNotFoundWidget,
 }) {
   showModalBottomSheet(
     context: context,
@@ -41,6 +43,8 @@ void showCountryListBottomSheet({
           showWorldWide,
           showSearch,
           customFlagBuilder,
+          intialSearchWidget,
+          searchNotFoundWidget,
         );
       },
     ),
@@ -61,6 +65,8 @@ Widget _builder(
   bool showWorldWide,
   bool showSearch,
   CustomFlagBuilder? customFlagBuilder,
+  Widget? intialSearchWidget,
+  Widget? searchNotFoundWidget,
 ) {
   final device = MediaQuery.of(context).size.height;
   final statusBarHeight = MediaQuery.of(context).padding.top;
@@ -102,6 +108,8 @@ Widget _builder(
       showWorldWide: showWorldWide,
       showSearch: showSearch,
       customFlagBuilder: customFlagBuilder,
+      intialSearchWidget: intialSearchWidget,
+      searchNotFoundWidget: searchNotFoundWidget,
     ),
   );
 }

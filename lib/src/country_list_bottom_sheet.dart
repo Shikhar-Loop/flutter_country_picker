@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 import 'country.dart';
 import 'country_list_theme_data.dart';
@@ -26,18 +27,22 @@ void showCountryListBottomSheet({
     backgroundColor: Colors.transparent,
     useSafeArea: useSafeArea,
     useRootNavigator: useRootNavigator,
-    builder: (context) => _builder(
-      context,
-      onSelect,
-      favorite,
-      exclude,
-      countryFilter,
-      showPhoneCode,
-      countryListTheme,
-      searchAutofocus,
-      showWorldWide,
-      showSearch,
-      customFlagBuilder,
+    builder: (context) => Sizer(
+      builder: (BuildContext context, _, __) {
+        return _builder(
+          context,
+          onSelect,
+          favorite,
+          exclude,
+          countryFilter,
+          showPhoneCode,
+          countryListTheme,
+          searchAutofocus,
+          showWorldWide,
+          showSearch,
+          customFlagBuilder,
+        );
+      },
     ),
   ).whenComplete(() {
     if (onClosed != null) onClosed();

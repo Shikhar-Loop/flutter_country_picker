@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '37 11 * * 4'
+    - cron: '45 11 * * 4'
   push:
     branches:
       - master
@@ -65,12 +65,20 @@ jobs:
 
       - name: Notify Teams Channel
         if: failure() || steps.osv-scan.outcome == 'failure'
-        run: |
-          RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
-          MESSAGE="{\"text\": \"OSV-Scanner results:\n$(cat osv-scan-results.json | jq -c .)\"}"
-          curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.TEAMS_WEBHOOK_URL }}
-        env:
-          TEAMS_WEBHOOK_URL: ${{ vars.TEAMS_WEBHOOK_URL }}
+        # run: |
+        #   RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
+        #   MESSAGE="{\"text\": \"OSV-Scanner results:\n$(cat osv-scan-results.json | jq -c .)\"}"
+        #   curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.TEAMS_WEBHOOK_URL }}
+        # env:
+        #   TEAMS_WEBHOOK_URL: ${{ vars.TEAMS_WEBHOOK_URL }}
+
+        uses: jdcargile/ms-teams-notification@v1.4
+        with:
+          github-token: ${{ github.token }} # this will use the runner's token.
+          ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+          notification-summary: OSV Scanned ${{osv-scan-results.json}}
+          notification-color: 17a2b8
+          verbose-logging: true
 
   
   

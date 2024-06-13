@@ -13,48 +13,64 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '30 11 * * 4'
+    - cron: '37 11 * * 4'
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 permissions:
-  # Require writing security events to upload SARIF file to security tab
   security-events: write
-  # Read commit contents
   contents: read
 
 jobs:
   osv-scan:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: scan-scheduled
-        id: osv-scan
-        if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-        uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@1f1242919d8a60496dd1874b24b62b2370ed4c78" # v1.7.1
-        with:
-      # Example of specifying custom arguments
-          scan-args: |-
-            --lockfile=pubspec.lock
-            --skip-git
-            --format=json
-            --output=new-results.json
-          upload-sarif: false
-          fail-on-vuln: true
-    
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Notify dedicated teams channel
+      - name: Setup OSV-Scanner
+        run: |
+          curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+          chmod +x osv-scanner
+          sudo mv osv-scanner /usr/local/bin/
+
+      - name: Run OSV-Scanner
+        id: osv-scan
+        run: |
+          osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
+        continue-on-error: true
+
+      - name: Upload OSV-Scanner results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: osv-scan-results
+          path: osv-scan-results.json
+
+  notify-teams:
+    needs: osv-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download OSV-Scanner results
+        uses: actions/download-artifact@v2
+        with:
+          name: osv-scan-results
+
+      - name: Notify Teams Channel
         if: failure() || steps.osv-scan.outcome == 'failure'
         run: |
           RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
           MESSAGE="{\"text\": \"OSV-Scanner results:\n$(cat osv-scan-results.json | jq -c .)\"}"
-          curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+          curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.TEAMS_WEBHOOK_URL }}
         env:
-          TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-        # uses: jdcargile/ms-teams-notification@v1.4
-        # with:
-        #   github-token: ${{ github.token }} # this will use the runner's token.
-        #   ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-        #   notification-summary: OSV Scanned ${{new-results.json}}
-        #   notification-color: 17a2b8
-        #   verbose-logging: true
+          TEAMS_WEBHOOK_URL: ${{ vars.TEAMS_WEBHOOK_URL }}
+
   
   

@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '35 08 * * 4'
+    - cron: '35 10 * * 4'
 
 permissions:
   # Require writing security events to upload SARIF file to security tab
@@ -33,6 +33,7 @@ jobs:
         --format=table
       upload-sarif: false
       fail-on-vuln: true
+      results-file-name: results.sarif
 
   notify:
       runs-on: ubuntu-latest

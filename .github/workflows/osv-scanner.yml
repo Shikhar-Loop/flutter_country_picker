@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '00 11 * * 4'
+    - cron: '10 11 * * 4'
 
 permissions:
   # Require writing security events to upload SARIF file to security tab
@@ -30,7 +30,8 @@ jobs:
       scan-args: |-
         --lockfile=pubspec.lock
         --skip-git
-        --format=table
+        --format=json
+        --output=new-results.json
       upload-sarif: false
       fail-on-vuln: true
 

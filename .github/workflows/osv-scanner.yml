@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '30 07 * * 4'
+    - cron: '35 08 * * 4'
 
 permissions:
   # Require writing security events to upload SARIF file to security tab
@@ -30,6 +30,7 @@ jobs:
       scan-args: |-
         --lockfile=pubspec.lock
         --skip-git
+        --format=table
       upload-sarif: false
       fail-on-vuln: true
 
@@ -44,6 +45,6 @@ jobs:
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          notification-summary: OSV Scanned 
+          notification-summary: OSV Scanned ${{results.sarif}}
           notification-color: 17a2b8
           verbose-logging: true

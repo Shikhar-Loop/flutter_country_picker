@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '00 08 * * 4'
+    - cron: '30 07 * * 4'
 
 permissions:
   # Require writing security events to upload SARIF file to security tab

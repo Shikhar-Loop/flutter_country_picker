@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '10 11 * * 4'
+    - cron: '30 11 * * 4'
 
 permissions:
   # Require writing security events to upload SARIF file to security tab
@@ -22,30 +22,39 @@ permissions:
   contents: read
 
 jobs:
-  scan-scheduled:
-    if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@1f1242919d8a60496dd1874b24b62b2370ed4c78" # v1.7.1
-    with:
-      # Example of specifying custom arguments
-      scan-args: |-
-        --lockfile=pubspec.lock
-        --skip-git
-        --format=json
-        --output=new-results.json
-      upload-sarif: false
-      fail-on-vuln: true
-
-  notify:
-      runs-on: ubuntu-latest
-
-      steps:
-      - uses: actions/checkout@v4
-      # this is the new step using the ms-teams-notification action
-      - name: Notify dedicated teams channel
-        uses: jdcargile/ms-teams-notification@v1.4
+  osv-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: scan-scheduled
+        id: osv-scan
+        if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
+        uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@1f1242919d8a60496dd1874b24b62b2370ed4c78" # v1.7.1
         with:
-          github-token: ${{ github.token }} # this will use the runner's token.
-          ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          notification-summary: OSV Scanned ${{new-results.json}}
-          notification-color: 17a2b8
-          verbose-logging: true
+      # Example of specifying custom arguments
+          scan-args: |-
+            --lockfile=pubspec.lock
+            --skip-git
+            --format=json
+            --output=new-results.json
+          upload-sarif: false
+          fail-on-vuln: true
+    
+
+      - name: Notify dedicated teams channel
+        if: failure() || steps.osv-scan.outcome == 'failure'
+        run: |
+          RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
+          MESSAGE="{\"text\": \"OSV-Scanner results:\n$(cat osv-scan-results.json | jq -c .)\"}"
+          curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        env:
+          TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        # uses: jdcargile/ms-teams-notification@v1.4
+        # with:
+        #   github-token: ${{ github.token }} # this will use the runner's token.
+        #   ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        #   notification-summary: OSV Scanned ${{new-results.json}}
+        #   notification-color: 17a2b8
+        #   verbose-logging: true
+  
+  

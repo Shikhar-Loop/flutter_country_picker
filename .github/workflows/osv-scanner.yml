@@ -105,8 +105,7 @@ jobs:
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
         run: |
-          SCAN_RESULTS=$(cat osv-scan-results.json)
-          RESULT=${{fromJson(SCAN_RESULTS).results}}
+          RESULT=$(jq -c .results osv-scan-results.json)
           MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULT}\"}"
           curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
           echo "Downloaded URL: ${RESULT}"

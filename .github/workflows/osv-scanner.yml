@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '00 5 * * 5'
+    - cron: '16 5 * * 5'
   push:
     branches:
       - master
@@ -36,7 +36,7 @@ jobs:
         run: |
           curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
           chmod +x osv-scanner
-          sudo mv osv-scanner /usr/local/bin/
+          sudo mv osv-scanner /usr/local/bin/osv-scanner
 
       - name: Run OSV-Scanner
         id: osv-scan

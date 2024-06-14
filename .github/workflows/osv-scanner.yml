@@ -32,17 +32,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         
-      - name: Setup OSV-Scanner
-        run: |
-          curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
-          chmod +x osv-scanner
-          sudo mv osv-scanner /usr/local/bin/osv-scanner
+      # - name: Setup OSV-Scanner
+      #   run: |
+      #     curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+      #     chmod +x osv-scanner
+      #     sudo mv osv-scanner /usr/local/bin/osv-scanner
           
       - name: Run OSV-Scanner
         id: osv-scan
-        run: |
-          osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
-        continue-on-error: true
+        # run: |
+        #   osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
+        uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@75532bf0bf75464b047d80414dbce04449498365" #1.7.3
+        with:
+          scan-args: |-
+            --lockfile=pubspec.lock
+            --format=json
+            --output=osv-scan-results.json
+            --skip-git
+          upload-sarif: false
+          fail-on-vuln: true
+        continue-on-error: false
         
       - name: Upload OSV-Scanner results
         if: always()

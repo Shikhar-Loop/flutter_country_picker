@@ -114,7 +114,7 @@ jobs:
           titleBackgroundColor: success    # Specify title background color. 'unitTest' is the ID of a step
           status: success                  # Specify what should be displayed in the status label
           message: >-
-            Scanned Result: ${{ env.RESULTS }}       # 'versioning' is the ID of the steps that creates versioning
+            Scanned Result: ${{ env.RESULTS }}
         env:                                                     # Enable actor labels and buttons using environment variables
           SHOULD_DISPLAY_ACTOR_LABEL: true
           SHOULD_DISPLAY_VIEW_RUN_BUTTON: true

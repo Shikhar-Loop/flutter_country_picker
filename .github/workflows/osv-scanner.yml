@@ -133,9 +133,21 @@ jobs:
              "value": "${{ env.RESULTS }}"
              },
              {
-             "name": "Dep2",
-             "value": "$(echo "${RESULTS}" | jq '. | length')"
-             }
+                 "name": "Repository",
+                 "value": "${{ env.REPO_URL }}"
+               },
+               {
+                 "name": "Commit Author",
+                 "value": "${{ env.COMMIT_AUTHOR }}"
+               },
+               {
+                 "name": "Commit Author Email",
+                 "value": "${{ env.COMMIT_AUTHOR_EMAIL }}"
+               },
+               {
+                 "name": "Commit Hash",
+                 "value": "${{ env.COMMIT_HASH }}"
+               }
               ],
           "markdown": true
           }],

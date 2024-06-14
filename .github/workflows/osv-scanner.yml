@@ -62,6 +62,22 @@ jobs:
         run: |
           /usr/local/bin/osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
         continue-on-error: true
+
+      - name: Get Commit Info
+        id: commit-info
+        run: |
+          COMMIT_HASH=$(git log -1 --pretty=format:'%H')
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+          COMMIT_AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')
+          COMMIT_AUTHOR_USERNAME=$(git log -1 --pretty=format:'%an' | awk '{print tolower($0)}') # Assuming username is lowercase name
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')
+          REPO_URL=${{ github.server_url }}/${{ github.repository }}
+          echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+          echo "COMMIT_AUTHOR=${COMMIT_AUTHOR}" >> $GITHUB_ENV
+          echo "COMMIT_AUTHOR_EMAIL=${COMMIT_AUTHOR_EMAIL}" >> $GITHUB_ENV
+          echo "COMMIT_AUTHOR_USERNAME=${COMMIT_AUTHOR_USERNAME}" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}" >> $GITHUB_ENV
+          echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
         
       - name: Upload OSV-Scanner results
         if: always()
@@ -80,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         
       - name: Download OSV-Scanner results
         uses: actions/download-artifact@v4
@@ -97,11 +113,11 @@ jobs:
           "@type": "MessageCard",
           "@context": "http://schema.org/extensions",
           "themeColor": "0076D7",
-          "title": "## Flutter Country Picker1",
-          "summary": "### Flutter Country Picker2",
+          "title": "Flutter Country Picker",
+          "summary": "Flutter Country Picker",
           "sections": [{
-             "activityTitle": "Flutter Country Picker3",
-             "text": "Here are the results from the latest OSV scan.",
+             "activityTitle": "OSV Scanner",
+             "text": "Result: ${RESULTS}",
              "facts": [{
              "name": "Number of Results",
              "value": "$(echo "${RESULTS}" | jq '. | length')"

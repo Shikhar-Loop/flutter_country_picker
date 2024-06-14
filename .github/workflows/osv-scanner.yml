@@ -42,12 +42,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
-      - name: Setup OSV-Scanner
+
+      - name: Get latest OSV-Scanner release
+        id: get_osv_scanner
         run: |
-          curl -L -o osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+          LATEST_URL=$(curl -s https://api.github.com/repos/google/osv-scanner/releases/latest | jq -r '.assets[] | select(.name | contains("osv-scanner-linux-amd64")) | .browser_download_url')
+          echo "OSV_SCANNER_URL=${LATEST_URL}" >> $GITHUB_ENV
+
+        continue-on-error: false
+
+      - name: Download OSV-Scanner
+        run: |
+          curl -L -o osv-scanner ${{ env.OSV_SCANNER_URL }}
           chmod +x osv-scanner
-          sudo mv osv-scanner /usr/local/bin/osv-scanner
+          sudo mv osv-scanner /usr/local/bin/osv-scanner  
+
+        continue-on-error: false
+        
+      # - name: Setup OSV-Scanner
+      #   run: |
+      #     curl -L -o osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+      #     chmod +x osv-scanner
+      #     sudo mv osv-scanner /usr/local/bin/osv-scanner
         #   # curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
         #   # chmod +x osv-scanner
         #   # sudo mv osv-scanner /usr/local/bin/osv-scanner

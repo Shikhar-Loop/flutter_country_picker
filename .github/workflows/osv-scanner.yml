@@ -121,6 +121,6 @@ jobs:
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          notification-summary: Flutter Country Picker:\n${{ env.RESULTS }}
+          notification-summary: Flutter Country Picker ${{ env.RESULTS }}
           notification-color: 17a2b8
           verbose-logging: true

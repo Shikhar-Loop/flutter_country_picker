@@ -43,21 +43,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get latest OSV-Scanner release
-        id: get_osv_scanner
-        run: |
-          curl_output=$(curl -s https://api.github.com/repos/google/osv-scanner/releases/latest)
-          echo "curl output: ${curl_output}"
-          OSV_SCANNER_URL=$(echo "$curl_output" | jq -r '.assets[0] | .browser_download_url')
-          echo "OSV_SCANNER_URL=${OSV_SCANNER_URL}" >> $GITHUB_ENV
-          echo "Downloaded URL: ${OSV_SCANNER_URL}"
+      # - name: Get latest OSV-Scanner release
+      #   id: get_osv_scanner
+      #   run: |
+      #     curl_output=$(curl -s https://api.github.com/repos/google/osv-scanner/releases/latest)
+      #     echo "curl output: ${curl_output}"
+      #     OSV_SCANNER_URL=$(echo "$curl_output" | jq -r '.assets[0] | .browser_download_url')
+      #     echo "OSV_SCANNER_URL=${OSV_SCANNER_URL}" >> $GITHUB_ENV
+      #     echo "Downloaded URL: ${OSV_SCANNER_URL}"
 
-        continue-on-error: false
+      #   continue-on-error: false
 
+# echo "Downloading from: ${OSV_SCANNER_URL}"
       - name: Download OSV-Scanner
         run: |
-          echo "Downloading from: ${OSV_SCANNER_URL}"
-          curl -L -o osv-scanner "${OSV_SCANNER_URL}"
+          curl -L -o osv-scanner https://github.com/google/osv-scanner/releases/download/v1.7.4/osv-scanner_linux_amd64
           chmod +x osv-scanner
           sudo mv osv-scanner /usr/local/bin/osv-scanner  
 
@@ -65,14 +65,10 @@ jobs:
         
       # - name: Setup OSV-Scanner
       #   run: |
-      #     curl -L -o osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+      #     curl -L -o osv-scanner https://github.com/google/osv-scanner/releases/download/v1.7.4/osv-scanner_linux_amd64
       #     chmod +x osv-scanner
       #     sudo mv osv-scanner /usr/local/bin/osv-scanner
-        #   # curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
-        #   # chmod +x osv-scanner
-        #   # sudo mv osv-scanner /usr/local/bin/osv-scanner
-        
-        # continue-on-error: false
+      #   continue-on-error: false
 
       - name: Verify OSV-Scanner 
         run: |

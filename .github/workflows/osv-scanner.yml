@@ -2,13 +2,11 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-
 # A sample workflow which sets up periodic OSV-Scanner scanning for vulnerabilities,
 # in addition to a PR check which fails if new vulnerabilities are introduced.
 #
 # For more examples and options, including how to ignore specific vulnerabilities,
 # see https://google.github.io/osv-scanner/github-action/
-
 name: OSV-Scanner
 
 on:
@@ -20,67 +18,64 @@ on:
   pull_request:
     branches:
       - master
-
+      
 permissions:
   security-events: write
   contents: read
-
+  
 jobs:
   osv-scan:
+  
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Download OSV-Scanner
+        
+      - name: Setup OSV-Scanner
         run: |
           curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
           chmod +x osv-scanner
-          sudo mv osv-scanner /usr/local/bin/
           sudo mv osv-scanner /usr/local/bin/osv-scanner
-
+          
       - name: Run OSV-Scanner
         id: osv-scan
         run: |
           /usr/local/bin/osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
         continue-on-error: true
-
+        
       - name: Upload OSV-Scanner results
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: osv-scan-results
           path: osv-scan-results.json
-
+          
   notify-teams:
     needs: osv-scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+        
       - name: Download OSV-Scanner results
         uses: actions/download-artifact@v2
         with:
           name: osv-scan-results
-
+          
       - name: Notify Teams Channel
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
-        # run: |
-        #   RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
-        #   MESSAGE="{\"text\": \"OSV-Scanner results:\n$(cat osv-scan-results.json | jq -c .)\"}"
-        #   curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.TEAMS_WEBHOOK_URL }}
-        # env:
-        #   TEAMS_WEBHOOK_URL: ${{ vars.TEAMS_WEBHOOK_URL }}
-
-        uses: jdcargile/ms-teams-notification@v1.4
-        with:
-          github-token: ${{ github.token }} # this will use the runner's token.
-          ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          notification-summary: OSV Scanned
-          notification-color: 17a2b8
-          verbose-logging: true
-
-  
-  
+        run: |
+          RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
+          MESSAGE="{\"text\": \"OSV-Scanner results:\n$(cat osv-scan-results.json | jq -c .)\"}"
+          curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        env:
+          TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        # uses: jdcargile/ms-teams-notification@v1.4
+        # with:
+        #   github-token: ${{ github.token }} # this will use the runner's token.
+        #   ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        #   notification-summary: OSV Scanned
+        #   notification-color: 17a2b8
+        #   verbose-logging: true

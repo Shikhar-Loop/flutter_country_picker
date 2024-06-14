@@ -92,7 +92,7 @@ jobs:
       - name: Set OSV-Scanner Results as Environment Variable
         run: |
           RESULTS=$(jq -c .results osv-scan-results.json)
-          echo "RESULTS=${RESULTS}" >> $GITHUB_ENV
+          echo "RESULTS=Shikhar:${RESULTS}" >> $GITHUB_ENV
           
   notify-teams:
     needs: osv-scan

@@ -66,6 +66,8 @@ jobs:
       - name: Get Commit Info
         id: commit-info
         run: |
+          set -x
+          
           echo "Fetching commit info..."
           COMMIT_HASH=$(git log -1 --pretty=format:'%H')
           COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
@@ -116,6 +118,8 @@ jobs:
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
         run: |
+          set -x
+          
           echo "Commit hash: ${{ env.COMMIT_HASH }}"
           echo "Commit author: ${{ env.COMMIT_AUTHOR }}"
           echo "Commit author email: ${{ env.COMMIT_AUTHOR_EMAIL }}"

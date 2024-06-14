@@ -66,13 +66,21 @@ jobs:
       - name: Get Commit Info
         id: commit-info
         run: |
+          echo "Fetching commit info..."
           COMMIT_HASH=$(git log -1 --pretty=format:'%H')
           COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
           COMMIT_AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')
-          COMMIT_AUTHOR_USERNAME=$(git log -1 --pretty=format:'%an' | awk '{print tolower($0)}') # Assuming username is lowercase name
+          COMMIT_AUTHOR_USERNAME=$(git log -1 --pretty=format:'%ae' | cut -d '@' -f 1)
           COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')
-          REPO_URL=${{ github.server_url }}/${{ github.repository }}
-          
+          REPO_URL="${{ github.server_url }}/${{ github.repository }}"
+
+          echo "COMMIT_HASH=${COMMIT_HASH}"
+          echo "COMMIT_AUTHOR=${COMMIT_AUTHOR}"
+          echo "COMMIT_AUTHOR_EMAIL=${COMMIT_AUTHOR_EMAIL}"
+          echo "COMMIT_AUTHOR_USERNAME=${COMMIT_AUTHOR_USERNAME}"
+          echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}"
+          echo "REPO_URL=${REPO_URL}"
+
           echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
           echo "COMMIT_AUTHOR=${COMMIT_AUTHOR}" >> $GITHUB_ENV
           echo "COMMIT_AUTHOR_EMAIL=${COMMIT_AUTHOR_EMAIL}" >> $GITHUB_ENV
@@ -117,7 +125,7 @@ jobs:
           "title": "OSV Scanner : Flutter Country Picker",
           "summary": "Flutter Country Picker",
           "sections": [{
-             "activityTitle": "on [${{github.repository}}](${{ env.REPO_URL }}) by ${{ env.COMMIT_AUTHOR_USERNAME}}",
+             "activityTitle": "on [${{github.repository}}](${{ github.server_url }}/${{ github.repository }}) by ${{ env.COMMIT_AUTHOR_USERNAME}}",
              "text": "Dependancies Affected",
              "facts": [
              {

@@ -26,41 +26,41 @@ permissions:
 jobs:
   osv-scan:
   
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@75532bf0bf75464b047d80414dbce04449498365" #1.7.3
-    with:
-      scan-args: |-
-        --lockfile=pubspec.lock
-        --format=json
-        --output=osv-scan-results.json
-        --skip-git
-      # upload-sarif: false
-      fail-on-vuln: true
+    # uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@75532bf0bf75464b047d80414dbce04449498365" #1.7.3
+    # with:
+    #   scan-args: |-
+    #     --lockfile=pubspec.lock
+    #     --format=json
+    #     --output=osv-scan-results.json
+    #     --skip-git
+    #   # upload-sarif: false
+    #   fail-on-vuln: true
 
   
-    # runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     
-    # steps:
-    #   - name: Checkout repository
-    #     uses: actions/checkout@v2
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
         
-    #   - name: Setup OSV-Scanner
-    #     run: |
-    #       curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
-    #       chmod +x osv-scanner
-    #       sudo mv osv-scanner /usr/local/bin/osv-scanner
+      - name: Setup OSV-Scanner
+        run: |
+          curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+          chmod +x osv-scanner
+          sudo mv osv-scanner /usr/local/bin/osv-scanner
           
-    #   - name: Run OSV-Scanner
-    #     id: osv-scan
-    #     run: |
-    #       osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
-    #     continue-on-error: false
+      - name: Run OSV-Scanner
+        id: osv-scan
+        run: |
+          /usr/local/bin/osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
+        continue-on-error: false
         
-    #   - name: Upload OSV-Scanner results
-    #     if: always()
-    #     uses: actions/upload-artifact@v2
-    #     with:
-    #       name: osv-scan-results
-    #       path: osv-scan-results.json
+      - name: Upload OSV-Scanner results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: osv-scan-results
+          path: osv-scan-results.json
           
   notify-teams:
     needs: osv-scan
@@ -78,7 +78,7 @@ jobs:
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
         run: |
-          SCAN_RESULTS=$(cat results.json)
+          SCAN_RESULTS=$(cat osv-scan-results.json)
           MESSAGE="{\"text\": \"OSV-Scanner results:\n${SCAN_RESULTS}\"}"
           curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
         #   # RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)

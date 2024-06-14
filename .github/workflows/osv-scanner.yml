@@ -68,7 +68,7 @@ jobs:
         #   # chmod +x osv-scanner
         #   # sudo mv osv-scanner /usr/local/bin/osv-scanner
         
-        continue-on-error: false
+        # continue-on-error: false
 
       - name: Verify OSV-Scanner 
         run: |

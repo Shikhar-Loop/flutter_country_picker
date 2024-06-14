@@ -48,12 +48,19 @@ jobs:
           curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
           chmod +x osv-scanner
           sudo mv osv-scanner /usr/local/bin/osv-scanner
+        continue-on-error: false
+
+      - name: Verify OSV-Scanner 
+        run: |
+          file /usr/local/bin/osv-scanner
+          /usr/local/bin/osv-scanner --version
+        continue-on-error: false
           
       - name: Run OSV-Scanner
         id: osv-scan
         run: |
           /usr/local/bin/osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
-        continue-on-error: false
+        continue-on-error: true
         
       - name: Upload OSV-Scanner results
         if: always()

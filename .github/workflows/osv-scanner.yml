@@ -88,6 +88,11 @@ jobs:
         with:
           name: osv-scan-results
           path: osv-scan-results.json
+
+      - name: Set OSV-Scanner Results as Environment Variable
+        run: |
+          RESULTS=$(jq -c .results osv-scan-results.json)
+          echo "RESULTS=${RESULTS}" >> $GITHUB_ENV
           
   notify-teams:
     needs: osv-scan
@@ -104,20 +109,18 @@ jobs:
       - name: Notify Teams Channel
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
-        run: |
-          RESULT=$(jq -c .results osv-scan-results.json)
-          MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULT}\"}"
-          curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          echo "${MESSAGE}"
-        #   # RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
-        #   # MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULTS}\"}"
-        #   # curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-        env:
-          TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-        # uses: jdcargile/ms-teams-notification@v1.4
-        # with:
-        #   github-token: ${{ github.token }} # this will use the runner's token.
-        #   ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-        #   notification-summary: OSV Scanned
-        #   notification-color: 17a2b8
-        #   verbose-logging: true
+        # run: |
+        #   RESULT=$(jq -c .results osv-scan-results.json) >>
+        #   MESSAGE="{\"text\": \"OSV-Scanner results:\n${{ env.RESULTS }}\"}"
+        #   curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        #   echo "${MESSAGE}"
+        # env:
+        #   TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+          
+        uses: jdcargile/ms-teams-notification@v1.4
+        with:
+          github-token: ${{ github.token }} # this will use the runner's token.
+          ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+          notification-summary: Flutter Country Picker:\n${{ env.RESULTS }}
+          notification-color: 17a2b8
+          verbose-logging: true

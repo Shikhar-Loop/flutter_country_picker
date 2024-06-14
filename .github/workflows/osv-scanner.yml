@@ -48,7 +48,7 @@ jobs:
         run: |
           curl_output=$(curl -s https://api.github.com/repos/google/osv-scanner/releases/latest)
           echo "curl output: ${curl_output}"
-          OSV_SCANNER_URL=$(echo "$curl_output" | jq -r '.assets[] | select(.name | contains("osv-scanner-linux-amd64")) | .browser_download_url')
+          OSV_SCANNER_URL=$(echo "$curl_output" | jq -r '.assets[0] | .browser_download_url')
           echo "OSV_SCANNER_URL=${OSV_SCANNER_URL}" >> $GITHUB_ENV
           echo "Downloaded URL: ${OSV_SCANNER_URL}"
 

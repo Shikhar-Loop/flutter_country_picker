@@ -97,8 +97,8 @@ jobs:
           "@type": "MessageCard",
           "@context": "http://schema.org/extensions",
           "themeColor": "0076D7",
-          "title": ## "Flutter Country Picker1",
-          "summary": ### "Flutter Country Picker2",
+          "title": "## Flutter Country Picker1",
+          "summary": "### Flutter Country Picker2",
           "sections": [{
              "activityTitle": "Flutter Country Picker3",
              "text": "Here are the results from the latest OSV scan.",

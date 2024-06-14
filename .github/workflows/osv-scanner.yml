@@ -33,7 +33,7 @@ jobs:
         --format=json
         --output=osv-scan-results.json
         --skip-git
-      upload-sarif: false
+      # upload-sarif: false
       fail-on-vuln: true
 
   

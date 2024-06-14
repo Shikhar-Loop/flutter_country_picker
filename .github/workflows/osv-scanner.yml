@@ -13,7 +13,7 @@ name: OSV-Scanner
 
 on:
   schedule:
-    - cron: '45 11 * * 4'
+    - cron: '00 5 * * 5'
   push:
     branches:
       - master
@@ -64,7 +64,8 @@ jobs:
           name: osv-scan-results
 
       - name: Notify Teams Channel
-        if: failure() || steps.osv-scan.outcome == 'failure'
+        # if: failure() || steps.osv-scan.outcome == 'failure'
+        if: always()
         # run: |
         #   RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
         #   MESSAGE="{\"text\": \"OSV-Scanner results:\n$(cat osv-scan-results.json | jq -c .)\"}"
@@ -76,7 +77,7 @@ jobs:
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
           ms-teams-webhook-uri: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          notification-summary: OSV Scanned ${{osv-scan-results.json}}
+          notification-summary: OSV Scanned
           notification-color: 17a2b8
           verbose-logging: true
 

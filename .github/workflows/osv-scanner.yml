@@ -67,12 +67,12 @@ jobs:
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
         run: |
-          # RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
-          # MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULTS}\"}"
-          # curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
           SCAN_RESULTS=$(cat osv-scan-results.json)
           MESSAGE="{\"text\": \"OSV-Scanner results:\n${SCAN_RESULTS}\"}"
           curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
+        #   # RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
+        #   # MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULTS}\"}"
+        #   # curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
         env:
           TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
         # uses: jdcargile/ms-teams-notification@v1.4

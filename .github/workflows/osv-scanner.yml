@@ -26,39 +26,41 @@ permissions:
 jobs:
   osv-scan:
   
-    runs-on: ubuntu-latest
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@75532bf0bf75464b047d80414dbce04449498365" #1.7.3
+    with:
+      scan-args: |-
+        --lockfile=pubspec.lock
+        --format=json
+        --output=osv-scan-results.json
+        --skip-git
+      upload-sarif: false
+      fail-on-vuln: true
+
+  
+    # runs-on: ubuntu-latest
     
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    # steps:
+    #   - name: Checkout repository
+    #     uses: actions/checkout@v2
         
-      # - name: Setup OSV-Scanner
-      #   run: |
-      #     curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
-      #     chmod +x osv-scanner
-      #     sudo mv osv-scanner /usr/local/bin/osv-scanner
+    #   - name: Setup OSV-Scanner
+    #     run: |
+    #       curl -Lo osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner-linux-amd64
+    #       chmod +x osv-scanner
+    #       sudo mv osv-scanner /usr/local/bin/osv-scanner
           
-      - name: Run OSV-Scanner
-        id: osv-scan
-        # run: |
-        #   osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
-        uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@75532bf0bf75464b047d80414dbce04449498365" #1.7.3
-        with:
-          scan-args: |-
-            --lockfile=pubspec.lock
-            --format=json
-            --output=osv-scan-results.json
-            --skip-git
-          upload-sarif: false
-          fail-on-vuln: true
-        continue-on-error: false
+    #   - name: Run OSV-Scanner
+    #     id: osv-scan
+    #     run: |
+    #       osv-scanner --lockfile=pubspec.lock --format=json > osv-scan-results.json
+    #     continue-on-error: false
         
-      - name: Upload OSV-Scanner results
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: osv-scan-results
-          path: osv-scan-results.json
+    #   - name: Upload OSV-Scanner results
+    #     if: always()
+    #     uses: actions/upload-artifact@v2
+    #     with:
+    #       name: osv-scan-results
+    #       path: osv-scan-results.json
           
   notify-teams:
     needs: osv-scan

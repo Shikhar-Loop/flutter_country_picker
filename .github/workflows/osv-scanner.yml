@@ -125,7 +125,7 @@ jobs:
           "title": "OSV Scanner : Flutter Country Picker",
           "summary": "Flutter Country Picker",
           "sections": [{
-             "activityTitle": "on [${{github.repository}}](${{ github.server_url }}/${{ github.repository }}) by ${{ env.COMMIT_AUTHOR_USERNAME}}",
+             "activityTitle": "on [${{github.repository}}](${{ github.server_url }}/${{ github.repository }}) by ${{ env.COMMIT_AUTHOR}}",
              "text": "Dependancies Affected",
              "facts": [
              {

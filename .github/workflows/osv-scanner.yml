@@ -116,6 +116,12 @@ jobs:
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
         run: |
+          echo "Commit hash: ${{ env.COMMIT_HASH }}"
+          echo "Commit author: ${{ env.COMMIT_AUTHOR }}"
+          echo "Commit author email: ${{ env.COMMIT_AUTHOR_EMAIL }}"
+          echo "Commit author username: ${{ env.COMMIT_AUTHOR_USERNAME }}"
+          echo "Repository URL: ${{ env.REPO_URL }}"
+
           RESULTS=$(echo "${{ env.RESULTS }}" | jq '.')
           MESSAGE=$(cat <<EOF
           {

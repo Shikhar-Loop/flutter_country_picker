@@ -108,6 +108,7 @@ jobs:
           SCAN_RESULTS=$(cat osv-scan-results.json)
           MESSAGE="{\"text\": \"OSV-Scanner results:\n${SCAN_RESULTS}\"}"
           curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+          echo "Downloaded URL: ${SCAN_RESULTS}"
         #   # RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
         #   # MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULTS}\"}"
         #   # curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}

@@ -106,9 +106,10 @@ jobs:
         if: always()
         run: |
           SCAN_RESULTS=$(cat osv-scan-results.json)
-          MESSAGE="{\"text\": \"OSV-Scanner results:\n${SCAN_RESULTS['results']}\"}"
+          RESULT=${{fromJson(SCAN_RESULTS).results}}
+          MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULT}\"}"
           curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          echo "Downloaded URL: ${SCAN_RESULTS}"
+          echo "Downloaded URL: ${RESULT}"
         #   # RESULTS=$(cat osv-scan-results.json | jq -Rc @uri)
         #   # MESSAGE="{\"text\": \"OSV-Scanner results:\n${RESULTS}\"}"
         #   # curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}

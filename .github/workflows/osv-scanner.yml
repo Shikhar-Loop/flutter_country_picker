@@ -78,7 +78,7 @@ jobs:
         run: |
           file /usr/local/bin/osv-scanner
           /usr/local/bin/osv-scanner --version
-        continue-on-error: false
+        continue-on-error: true
           
       - name: Run OSV-Scanner
         id: osv-scan

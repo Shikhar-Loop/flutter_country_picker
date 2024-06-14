@@ -90,13 +90,44 @@ jobs:
       - name: Notify Teams Channel
         # if: failure() || steps.osv-scan.outcome == 'failure'
         if: always()
-        # run: |
-        #   RESULT=$(jq -c .results osv-scan-results.json) >>
-        #   MESSAGE="{\"text\": \"OSV-Scanner results:\n${{ env.RESULTS }}\"}"
-        #   curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-        #   echo "${MESSAGE}"
-        # env:
-        #   TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+        run: |
+          RESULTS=$(echo "${{ env.RESULTS }}" | jq '.')
+          MESSAGE=$(cat <<EOF
+          {
+          "@type": "MessageCard",
+          "@context": "http://schema.org/extensions",
+          "themeColor": "0076D7",
+          "summary": "OSV-Scanner results",
+          "sections": [{
+             "activityTitle": "OSV-Scanner Results",
+             "text": "Here are the results from the latest OSV scan.",
+             "facts": [{
+             "name": "Number of Results",
+             "value": "$(echo "${RESULTS}" | jq '. | length')"
+              }],
+          "markdown": true
+          }],
+          "potentialAction": [{
+             "@type": "OpenUri",
+             "name": "View Full Results",
+             "targets": [{
+                "os": "default",
+                "uri": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+             }]
+           }]
+          }
+          EOF
+          )
+          
+          echo "Sending message to Teams: ${MESSAGE}"
+
+        
+          # RESULT=$(jq -c .results osv-scan-results.json) >>
+          # MESSAGE="{\"text\": \"OSV-Scanner results:\n${{ env.RESULTS }}\"}"
+          curl -H "Content-Type: application/json" -d "$MESSAGE" ${{ vars.MS_TEAMS_WEBHOOK_URL }}
+          echo "${MESSAGE}"
+        env:
+          TEAMS_WEBHOOK_URL: ${{ vars.MS_TEAMS_WEBHOOK_URL }}
           
         # uses: jdcargile/ms-teams-notification@v1.4
         # with:
@@ -105,16 +136,3 @@ jobs:
         #   notification-summary: Flutter Country Picker ${{ env.RESULTS }}
         #   notification-color: 17a2b8
         #   verbose-logging: true
-
-        uses: neonidian/teams-notify-build-status@v3
-        with:
-          webhookUrl: |                                         # Send to multiple channels in MS Teams
-            ${{ vars.MS_TEAMS_WEBHOOK_URL }}
-          title: Flutter Country Picker                                      # Specify a title header
-          titleBackgroundColor: success    # Specify title background color. 'unitTest' is the ID of a step
-          status: success                  # Specify what should be displayed in the status label
-          message:  \"Scanned Result ${{ env.RESULTS }}\"
-        env:                                                     # Enable actor labels and buttons using environment variables
-          SHOULD_DISPLAY_ACTOR_LABEL: true
-          SHOULD_DISPLAY_VIEW_RUN_BUTTON: true
-          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true

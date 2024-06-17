@@ -154,28 +154,28 @@ jobs:
           "title": "OSV Scanner : Flutter Country Picker",
           "summary": "Flutter Country Picker",
           "sections": [{
-             "activityTitle": "on [${{github.repository}}](${{ github.server_url }}/${{ github.repository }}) by ${{ env.COMMIT_AUTHOR}}",
+             "activityTitle": "on [${{github.repository}}]($REPO_URL) by $COMMIT_AUTHOR",
              "text": "Dependancies Affected",
              "facts": [
              {
              "name": "Dep1",
-             "value": "${{ needs.get_result_var.outputs.Results }}"
+             "value": "$RESULTS"
              },
              {
                  "name": "Repository",
-                 "value": "${{ needs.commit-info.outputs.REPO_URL }}"
+                 "value": "$REPO_URL"
                },
                {
                  "name": "Commit Author",
-                 "value": "${{ needs.commit-info.outputs.COMMIT_AUTHOR }}"
+                 "value": "$COMMIT_AUTHOR"
                },
                {
                  "name": "Commit Author Email",
-                 "value": "${{ needs.commit-info.outputs.COMMIT_AUTHOR_EMAIL }}"
+                 "value": "$COMMIT_AUTHOR_EMAIL"
                },
                {
                  "name": "Commit Hash",
-                 "value": "${{ needs.commit-info.outputs.COMMIT_HASH }}"
+                 "value": "$COMMIT_HASH"
                }
               ],
           "markdown": true

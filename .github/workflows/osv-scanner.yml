@@ -74,29 +74,28 @@ jobs:
       - name: Get Commit Info
         id: commit-info
         run: |
-          set -x
-          
+        
           echo "Fetching commit info..."
-          COMMIT_HASH=$(git log -1 --pretty=format:'%H')
-          COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
-          COMMIT_AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')
-          COMMIT_AUTHOR_USERNAME=$(git log -1 --pretty=format:'%ae' | cut -d '@' -f 1)
-          COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')
-          REPO_URL="${{ github.server_url }}/${{ github.repository }}"
+          commit_hash=$(git log -1 --pretty=format:'%H')
+          commit_author=$(git log -1 --pretty=format:'%an')
+          commit_author_email=$(git log -1 --pretty=format:'%ae')
+          commit_author_username=$(git log -1 --pretty=format:'%ae' | cut -d '@' -f 1)
+          commit_message=$(git log -1 --pretty=format:'%s')
+          repo_url="${{ github.server_url }}/${{ github.repository }}"
 
-          echo "COMMIT_HASH=${COMMIT_HASH}"
-          echo "COMMIT_AUTHOR=${COMMIT_AUTHOR}"
-          echo "COMMIT_AUTHOR_EMAIL=${COMMIT_AUTHOR_EMAIL}"
-          echo "COMMIT_AUTHOR_USERNAME=${COMMIT_AUTHOR_USERNAME}"
-          echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}"
-          echo "REPO_URL=${REPO_URL}"
+          echo "COMMIT_HASH=${commit_hash}"
+          echo "COMMIT_AUTHOR=${commit_author}"
+          echo "COMMIT_AUTHOR_EMAIL=${commit_author_email}"
+          echo "COMMIT_AUTHOR_USERNAME=${commit_author_username}"
+          echo "COMMIT_MESSAGE=${commit_message}"
+          echo "REPO_URL=${repo_url}"
 
-          echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_OUTPUT
-          echo "COMMIT_AUTHOR=${COMMIT_AUTHOR}" >> $GITHUB_OUTPUT
-          echo "COMMIT_AUTHOR_EMAIL=${COMMIT_AUTHOR_EMAIL}" >> $GITHUB_OUTPUT
-          echo "COMMIT_AUTHOR_USERNAME=${COMMIT_AUTHOR_USERNAME}" >> $GITHUB_OUTPUT
-          echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}" >> $GITHUB_OUTPUT
-          echo "REPO_URL=${REPO_URL}" >> $GITHUB_OUTPUT
+          echo "COMMIT_HASH=${commit_hash}" >> $GITHUB_OUTPUT
+          echo "COMMIT_AUTHOR=${commit_author}" >> $GITHUB_OUTPUT
+          echo "COMMIT_AUTHOR_EMAIL=${commit_author_email}" >> $GITHUB_OUTPUT
+          echo "COMMIT_AUTHOR_USERNAME=${commit_author_username}" >> $GITHUB_OUTPUT
+          echo "COMMIT_MESSAGE=${commit_message}" >> $GITHUB_OUTPUT
+          echo "REPO_URL=${repo_url}" >> $GITHUB_OUTPUT
         
       - name: Upload OSV-Scanner results
         if: always()
@@ -108,11 +107,12 @@ jobs:
       - name: Set OSV-Scanner Results as Environment Variable
         id: get_result_var
         run: |
-          RESULTS=$(jq -c .results osv-scan-results.json)
-          echo "RESULTS=Shikhar:${RESULTS}" >> $GITHUB_OUTPUT
+        
+          results=$(jq -c .results osv-scan-results.json)
+          echo "RESULTS=${results}" >> $GITHUB_OUTPUT
           
   notify-teams:
-    needs: [osv-scan]
+    needs: osv-scan
     runs-on: ubuntu-latest
     env:
       REPO_URL: ${{ needs.commit-info.outputs.repo_url }}
@@ -139,7 +139,7 @@ jobs:
         run: |
           set -x
           
-          echo "Commit hash: ${{ env.COMMIT_HASH }}"
+          echo "Commit hash: ${{ needs.commit-info.outputs.COMMIT_HASH }}"
           echo "Commit author: ${{ env.COMMIT_AUTHOR }}"
           echo "Commit author email: ${{ env.COMMIT_AUTHOR_EMAIL }}"
           echo "Commit author username: ${{ env.COMMIT_AUTHOR_USERNAME }}"

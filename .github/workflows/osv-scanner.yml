@@ -39,13 +39,13 @@ jobs:
   
     runs-on: ubuntu-latest
     outputs:
-      COMMIT_HASH: ${{ steps.commit-info.outputs.COMMIT_HASH }}
-      COMMIT_AUTHOR: ${{ steps.commit-info.outputs.COMMIT_AUTHOR }}
-      COMMIT_AUTHOR_EMAIL: ${{ steps.commit-info.outputs.COMMIT_AUTHOR_EMAIL }}
-      COMMIT_AUTHOR_USERNAME: ${{ steps.commit-info.outputs.COMMIT_AUTHOR_USERNAME }}
-      COMMIT_MESSAGE: ${{ steps.commit-info.outputs.COMMIT_MESSAGE }}
-      REPO_URL: ${{ steps.commit-info.outputs.REPO_URL }}
-      RESULTS: ${{ steps.get_result_var.outputs.RESULTS }}
+      commit_hash: ${{ steps.commit-info.outputs.COMMIT_HASH }}
+      commit_author: ${{ steps.commit-info.outputs.COMMIT_AUTHOR }}
+      commit_author_email: ${{ steps.commit-info.outputs.COMMIT_AUTHOR_EMAIL }}
+      commit_author_username: ${{ steps.commit-info.outputs.COMMIT_AUTHOR_USERNAME }}
+      commit_message: ${{ steps.commit-info.outputs.COMMIT_MESSAGE }}
+      repo_url: ${{ steps.commit-info.outputs.REPO_URL }}
+      results: ${{ steps.get_result_var.outputs.RESULTS }}
       
     steps:
       - name: Checkout repository
@@ -112,8 +112,18 @@ jobs:
           echo "RESULTS=Shikhar:${RESULTS}" >> $GITHUB_OUTPUT
           
   notify-teams:
-    needs: osv-scan
+    needs: [osv-scan]
     runs-on: ubuntu-latest
+    env:
+      REPO_URL: ${{ needs.commit-info.outputs.repo_url }}
+      COMMIT_HASH: ${{ needs.commit-info.outputs.commit_hash }}
+      COMMIT_AUTHOR: ${{ needs.commit-info.outputs.commit_author }}
+      COMMIT_AUTHOR_EMAIL: ${{ needs.commit-info.outputs.commit_author_email }}
+      COMMIT_AUTHOR_USERNAME: ${{ needs.commit-info.outputs.commit_author_username }}
+      COMMIT_MESSAGE: ${{ needs.commit-info.outputs.commit_message }}
+      RESULTS: ${{ needs.get_result_var.outputs.results }}
+          
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -129,11 +139,11 @@ jobs:
         run: |
           set -x
           
-          echo "Commit hash: ${{ needs.commit-info.outputs.COMMIT_HASH }}"
-          echo "Commit author: ${{ needs.commit-info.outputs.COMMIT_AUTHOR }}"
-          echo "Commit author email: ${{ needs.commit-info.outputs.COMMIT_AUTHOR_EMAIL }}"
-          echo "Commit author username: ${{ needs.commit-info.outputs.COMMIT_AUTHOR_USERNAME }}"
-          echo "Repository URL: ${{ needs.commit-info.outputs.REPO_URL }}"
+          echo "Commit hash: ${{ env.COMMIT_HASH }}"
+          echo "Commit author: ${{ env.COMMIT_AUTHOR }}"
+          echo "Commit author email: ${{ env.COMMIT_AUTHOR_EMAIL }}"
+          echo "Commit author username: ${{ env.COMMIT_AUTHOR_USERNAME }}"
+          echo "Repository URL: ${{ env.REPO_URL }}"
 
           RESULTS=$(echo "${{ env.RESULTS }}" | jq '.')
           MESSAGE=$(cat <<EOF

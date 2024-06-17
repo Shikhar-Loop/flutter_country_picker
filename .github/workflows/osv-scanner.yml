@@ -38,7 +38,15 @@ jobs:
 
   
     runs-on: ubuntu-latest
-    
+    outputs:
+      COMMIT_HASH: ${{ steps.commit-info.outputs.COMMIT_HASH }}
+      COMMIT_AUTHOR: ${{ steps.commit-info.outputs.COMMIT_AUTHOR }}
+      COMMIT_AUTHOR_EMAIL: ${{ steps.commit-info.outputs.COMMIT_AUTHOR_EMAIL }}
+      COMMIT_AUTHOR_USERNAME: ${{ steps.commit-info.outputs.COMMIT_AUTHOR_USERNAME }}
+      COMMIT_MESSAGE: ${{ steps.commit-info.outputs.COMMIT_MESSAGE }}
+      REPO_URL: ${{ steps.commit-info.outputs.REPO_URL }}
+      RESULTS: ${{ steps.get_result_var.outputs.RESULTS }}
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -83,12 +91,12 @@ jobs:
           echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}"
           echo "REPO_URL=${REPO_URL}"
 
-          echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
-          echo "COMMIT_AUTHOR=${COMMIT_AUTHOR}" >> $GITHUB_ENV
-          echo "COMMIT_AUTHOR_EMAIL=${COMMIT_AUTHOR_EMAIL}" >> $GITHUB_ENV
-          echo "COMMIT_AUTHOR_USERNAME=${COMMIT_AUTHOR_USERNAME}" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}" >> $GITHUB_ENV
-          echo "REPO_URL=${REPO_URL}" >> $GITHUB_ENV
+          echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_OUTPUT
+          echo "COMMIT_AUTHOR=${COMMIT_AUTHOR}" >> $GITHUB_OUTPUT
+          echo "COMMIT_AUTHOR_EMAIL=${COMMIT_AUTHOR_EMAIL}" >> $GITHUB_OUTPUT
+          echo "COMMIT_AUTHOR_USERNAME=${COMMIT_AUTHOR_USERNAME}" >> $GITHUB_OUTPUT
+          echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}" >> $GITHUB_OUTPUT
+          echo "REPO_URL=${REPO_URL}" >> $GITHUB_OUTPUT
         
       - name: Upload OSV-Scanner results
         if: always()
@@ -98,9 +106,10 @@ jobs:
           path: osv-scan-results.json
 
       - name: Set OSV-Scanner Results as Environment Variable
+        id: get_result_var
         run: |
           RESULTS=$(jq -c .results osv-scan-results.json)
-          echo "RESULTS=Shikhar:${RESULTS}" >> $GITHUB_ENV
+          echo "RESULTS=Shikhar:${RESULTS}" >> $GITHUB_OUTPUT
           
   notify-teams:
     needs: osv-scan
@@ -120,11 +129,11 @@ jobs:
         run: |
           set -x
           
-          echo "Commit hash: ${{ env.COMMIT_HASH }}"
-          echo "Commit author: ${{ env.COMMIT_AUTHOR }}"
-          echo "Commit author email: ${{ env.COMMIT_AUTHOR_EMAIL }}"
-          echo "Commit author username: ${{ env.COMMIT_AUTHOR_USERNAME }}"
-          echo "Repository URL: ${{ env.REPO_URL }}"
+          echo "Commit hash: ${{ needs.commit-info.outputs.COMMIT_HASH }}"
+          echo "Commit author: ${{ needs.commit-info.outputs.COMMIT_AUTHOR }}"
+          echo "Commit author email: ${{ needs.commit-info.outputs.COMMIT_AUTHOR_EMAIL }}"
+          echo "Commit author username: ${{ needs.commit-info.outputs.COMMIT_AUTHOR_USERNAME }}"
+          echo "Repository URL: ${{ needs.commit-info.outputs.REPO_URL }}"
 
           RESULTS=$(echo "${{ env.RESULTS }}" | jq '.')
           MESSAGE=$(cat <<EOF
@@ -140,23 +149,23 @@ jobs:
              "facts": [
              {
              "name": "Dep1",
-             "value": "${{ env.RESULTS }}"
+             "value": "${{ needs.get_result_var.outputs.Results }}"
              },
              {
                  "name": "Repository",
-                 "value": "${{ env.REPO_URL }}"
+                 "value": "${{ needs.commit-info.outputs.REPO_URL }}"
                },
                {
                  "name": "Commit Author",
-                 "value": "${{ env.COMMIT_AUTHOR }}"
+                 "value": "${{ needs.commit-info.outputs.COMMIT_AUTHOR }}"
                },
                {
                  "name": "Commit Author Email",
-                 "value": "${{ env.COMMIT_AUTHOR_EMAIL }}"
+                 "value": "${{ needs.commit-info.outputs.COMMIT_AUTHOR_EMAIL }}"
                },
                {
                  "name": "Commit Hash",
-                 "value": "${{ env.COMMIT_HASH }}"
+                 "value": "${{ needs.commit-info.outputs.COMMIT_HASH }}"
                }
               ],
           "markdown": true

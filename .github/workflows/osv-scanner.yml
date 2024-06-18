@@ -192,11 +192,11 @@ jobs:
           if [ $PACKAGES_AFFECTED -gt 0 ]; then
             THEME_COLOR="FF0000" # Red
             TEXT="## Dependancies Affected : $PACKAGES_AFFECTED"
-            FACTS='[{"name": "Vulnerabilities : ", "value": "'"$RESULTS_MESSAGE"'"}]'
+            FACTS='{"name": "Vulnerabilities : ", "value": "'"$RESULTS_MESSAGE"'"}'
           else
             THEME_COLOR="00FF00" # Green
             TEXT="$RESULTS_MESSAGE"
-            FACTS='[{}]'
+            FACTS='{"name": "Vulnerabilities : ", "value": "No Vulnerabilities"}'
           fi
 
           RESULTS=$(echo "${{ env.RESULTS }}" | jq '.')

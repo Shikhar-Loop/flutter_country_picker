@@ -210,7 +210,7 @@ jobs:
           "sections": [{
              "activityTitle": "on [${{github.repository}}]($REPO_URL) by $COMMIT_AUTHOR",
              "text": "$TEXT",
-             "facts": $FACTS,
+             "facts": [$FACTS],
           "markdown": true
           }],
           "potentialAction": [{

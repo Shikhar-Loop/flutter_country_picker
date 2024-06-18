@@ -99,11 +99,13 @@ jobs:
         run: |
         
           results=$(jq '.results' osv-scan-results.json)
+          
+          packages_length=0 
+          
           if [[ $(echo "$results" | jq 'length') -eq 0 ]]; then
             message="No vulnerabilities found"
           else
             message=""
-            packages_length=0 
             for row in $(echo "$results" | jq -r '.[] | @base64'); do
               _jq() {
                 echo ${row} | base64 --decode | jq -r ${1}
@@ -114,7 +116,7 @@ jobs:
               if [ "$packages" != "null" ] && [ ! -z "$packages" ] && [[ $(echo "$packages" | jq 'length') -gt 0 ]]; then
                 
                 packages_length=$(echo "$packages" | jq 'length')
-                echo "PACKAGES_AFFECTED=${packages_length}" >> $GITHUB_OUTPUT
+
                 for package in $(echo "$packages" | jq -r '.[] | @base64'); do
                   _pkg() {
                     echo ${package} | base64 --decode | jq -r ${1}
@@ -146,6 +148,8 @@ jobs:
               fi
             done
           fi
+          
+          echo "PACKAGES_AFFECTED=${packages_length}" >> $GITHUB_OUTPUT
           echo "RESULTS_MESSAGE=${message}" >> $GITHUB_OUTPUT
           echo "$message"
           

@@ -183,6 +183,7 @@ jobs:
           echo "Commit author username: $COMMIT_AUTHOR_USERNAME"
           echo "Repository URL: $REPO_URL"
           echo "Result Message: $RESULTS_MESSAGE"
+          echo "Packages Affected: $PACKAGES_AFFECTED"
 
           if [ $PACKAGES_AFFECTED -gt 0 ]; then
             THEME_COLOR="FF0000" # Red

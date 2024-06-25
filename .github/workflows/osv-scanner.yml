@@ -12,9 +12,9 @@ name: OSV-Scanner
 on:
 #   schedule:
 #     - cron: '30 5 * * 3'
-  push:
-    branches:
-      - master
+  # push:
+  #   branches:
+  #     - master
   pull_request:
     branches:
       - master
